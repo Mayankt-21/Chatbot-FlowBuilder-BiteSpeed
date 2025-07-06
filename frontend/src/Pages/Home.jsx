@@ -4,6 +4,7 @@ import NodesPane from "../components/Sidebars/NodesPane";
 import SettingsPane from "../components/Sidebars/SettingsPane";
 import Navbar from "../components/Others/Navbar";
 import { ArrowRight, ArrowLeft } from "lucide-react";
+import { ReactFlowProvider } from "@xyflow/react";
 
 const SIDEBAR_WIDTH = 300; // Fixed width in pixels
 
@@ -12,6 +13,7 @@ const Home = () => {
   const [activePane, setActivePane] = useState("nodes");
 
   return (
+    <ReactFlowProvider>
     <div className="flex flex-col h-screen">
       <Navbar />
       <div className="flex flex-1 overflow-hidden">
@@ -71,6 +73,7 @@ const Home = () => {
         </div>
       </div>
     </div>
+    </ReactFlowProvider>
   );
 };
 

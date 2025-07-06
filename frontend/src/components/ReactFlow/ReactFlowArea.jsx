@@ -5,8 +5,9 @@ import {
   MiniMap,
   Controls,
   Panel,
-  ReactFlowProvider,
   useReactFlow,
+  addEdge,
+  MarkerType,
 } from "@xyflow/react";
 import MessageNode from "../NodeTypes/MessageNode";
 import "@xyflow/react/dist/style.css";
@@ -34,9 +35,21 @@ const initialNodes = [
   },
 ];
 
+const initialEdges = [];
+
 // Define the node types
 const nodeTypes = {
   messageNode: MessageNode,
+};
+
+const defaultEdgeOptions = {
+  animated: true,
+  type: 'smoothstep',
+  style: { stroke: '#1B3C53' },
+  markerEnd: {
+    type: MarkerType.ArrowClosed,
+    color: '#1B3C53',
+  },
 };
 
 const BackgroundType = {
@@ -45,8 +58,9 @@ const BackgroundType = {
   cross: "Cross",
 };
 
-const Flow = () => {
+const ReactFlowArea = () => {
   const [nodes, setNodes] = useState(initialNodes);
+  const [edges, setEdges] = useState(initialEdges);
   const [variant, setvariant] = useState("dots");
   const [showMiniMap, setShowMiniMap] = useState(true);
   const reactFlowInstance = useReactFlow();
@@ -92,6 +106,86 @@ const Flow = () => {
     [nodes, reactFlowInstance]
   );
 
+  const onConnect = useCallback(
+    (params) => {
+      const newEdge = {
+        ...params,
+        id: `edge-${edges.length + 1}`,
+        type: 'smoothstep',
+        animated: true,
+        style: { stroke: '#1B3C53' },
+        markerEnd: {
+          type: MarkerType.ArrowClosed,
+          color: '#1B3C53',
+        },
+      };
+      setEdges((eds) => addEdge(newEdge, eds));
+    },
+    [edges]
+  );
+
+  // Handle node movement
+  const onNodeDrag = useCallback((event, node, nodes) => {
+    // Dispatch node movement event for real-time tracking
+    const moveEvent = new CustomEvent('nodeDragging', {
+      detail: {
+        nodeId: node.id,
+        position: node.position,
+        nodes: nodes
+      }
+    });
+    window.dispatchEvent(moveEvent);
+  }, []);
+
+  const onNodeDragStop = useCallback((event, node, nodes) => {
+    // Update node positions after drag
+    setNodes((nds) =>
+      nds.map((n) => {
+        if (n.id === node.id) {
+          return {
+            ...n,
+            position: node.position,
+          };
+        }
+        return n;
+      })
+    );
+
+    // Dispatch node movement end event
+    const dragEndEvent = new CustomEvent('nodeDragComplete', {
+      detail: {
+        nodeId: node.id,
+        finalPosition: node.position,
+        nodes: nodes
+      }
+    });
+    window.dispatchEvent(dragEndEvent);
+  }, []);
+
+  const onNodesDelete = useCallback(
+    (nodesToDelete) => {
+      // Remove connected edges when nodes are deleted
+      setEdges((eds) =>
+        eds.filter(
+          (edge) =>
+            !nodesToDelete.some(
+              (node) => node.id === edge.source || node.id === edge.target
+            )
+        )
+      );
+    },
+    []
+  );
+
+  // Get current flow state
+  const getFlowState = useCallback(() => {
+    if (reactFlowInstance) {
+      const flowState = reactFlowInstance.toObject();
+      console.log('Current Flow State:', flowState);
+      return flowState;
+    }
+  }, [reactFlowInstance]);
+
   const BackgroundButtons = () => {
     return (
       <div className="flex gap-2">
@@ -104,33 +198,62 @@ const Flow = () => {
             {value}
           </button>
         ))}
+        <button
+          onClick={getFlowState}
+          className="flex justify-center items-center bg-green-600 text-white rounded-md p-2 ml-4"
+        >
+          View Flow State
+        </button>
       </div>
     );
   };
+
+  // Add event listeners for node movement tracking
+  React.useEffect(() => {
+    const logNodeMovement = (event) => {
+      console.log('Node Movement:', event.detail);
+    };
+
+    window.addEventListener('nodeDragging', logNodeMovement);
+    window.addEventListener('nodeDragComplete', logNodeMovement);
+
+    return () => {
+      window.removeEventListener('nodeDragging', logNodeMovement);
+      window.removeEventListener('nodeDragComplete', logNodeMovement);
+    };
+  }, []);
 
   return (
     <div className="w-screen h-screen text-black">
       <ReactFlow
         nodes={nodes}
+        edges={edges}
         nodeTypes={nodeTypes}
         onDragOver={onDragOver}
         onDrop={onDrop}
+        onConnect={onConnect}
+        onNodeDrag={onNodeDrag}
+        onNodeDragStop={onNodeDragStop}
+        onNodesDelete={onNodesDelete}
+        defaultEdgeOptions={defaultEdgeOptions}
         fitView
+        snapToGrid
+        snapGrid={[15, 15]}
+        deleteKeyCode={['Backspace', 'Delete']}
+        multiSelectionKeyCode={['Control', 'Meta']}
+        selectionOnDrag
+        selectNodesOnDrag
+        panOnDrag={[0, 1, 2]}
+        className="transition-all duration-300 ease-in-out"
       >
-        <Panel position="top-left"> <BackgroundButtons/> </Panel>
+        <Panel position="top-left">
+          <BackgroundButtons/>
+        </Panel>
         <Background variant={variant} />
         {showMiniMap && <MiniMap />}
         <Controls />
       </ReactFlow>
     </div>
-  );
-};
-
-const ReactFlowArea = () => {
-  return (
-    <ReactFlowProvider>
-      <Flow />
-    </ReactFlowProvider>
   );
 };
 
