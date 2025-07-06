@@ -34,7 +34,7 @@ const Home = () => {
           {/* Toggle Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 bg-gray-800 text-white p-2 rounded-l-md hover:bg-gray-700 cursor-pointer transition-colors"
+            className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 bg-[#1B3C53] text-white p-2 rounded-l-md hover:bg-gray-700 cursor-pointer transition-colors"
           >
             {isOpen ? <ArrowRight size={20} /> : <ArrowLeft size={20} />}
           </button>
@@ -46,7 +46,7 @@ const Home = () => {
                 onClick={() => setActivePane("nodes")}
                 className={`px-3 py-1.5 rounded ${
                   activePane === "nodes" 
-                    ? "bg-gray-800 text-white" 
+                    ? "bg-[#1B3C53] text-white" 
                     : "bg-white hover:bg-gray-50"
                 }`}
               >
@@ -56,7 +56,7 @@ const Home = () => {
                 onClick={() => setActivePane("settings")}
                 className={`px-3 py-1.5 rounded ${
                   activePane === "settings" 
-                    ? "bg-gray-800 text-white" 
+                    ? "bg-[#1B3C53] text-white" 
                     : "bg-white hover:bg-gray-50"
                 }`}
               >
