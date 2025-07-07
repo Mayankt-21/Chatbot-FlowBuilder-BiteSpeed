@@ -6,7 +6,7 @@ import { useAppContext } from "../../contexts/AppContext";
 const MessageNode = ({ id, data }) => {
   const { getEdges } = useReactFlow();
   const [message, setMessage] = useState(data.message);
-  const { selectedNode, setSelectedNode, setActivePane, setIsSidebarOpen } = useAppContext();
+  const { selectedNode, setSelectedNode, setActivePane, setIsSidebarOpen, nodes } = useAppContext();
 
   const isValidSourceConnection = (connection) => {
     const edges = getEdges();
@@ -20,6 +20,13 @@ const MessageNode = ({ id, data }) => {
     }
   }, [selectedNode, id, setActivePane]);
 
+  // Update local message when node data changes
+  useEffect(() => {
+    const node = nodes.find(n => n.id === id);
+    if (node) {
+      setMessage(node.data.message);
+    }
+  }, [nodes, id]);
 
   return (
     <>

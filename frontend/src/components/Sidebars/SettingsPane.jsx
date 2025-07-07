@@ -1,64 +1,82 @@
-import React, { useEffect } from 'react';
-import { useAppContext } from '../../contexts/AppContext';
+import React, { useEffect } from "react";
+import { useAppContext } from "../../contexts/AppContext";
 import { MessageSquare } from "lucide-react";
-import { useReactFlow } from '@xyflow/react';
-import { ArrowLeftRight } from 'lucide-react';
+import { useReactFlow } from "@xyflow/react";
+import { ArrowLeftRight } from "lucide-react";
 
 const SettingsPane = () => {
-  const { 
-    settings, 
+  const {
+    settings,
     setSettings,
     selectedNode,
-    setSelectedNode
+    setSelectedNode,
+    nodes,
+    setNodes
   } = useAppContext();
 
-  const { nodes, getEdges, getNodes } = useReactFlow();
+  const { getEdges, getNodes } = useReactFlow();
 
   const handleShowMiniMapToggle = () => {
-    setSettings(prev => ({
+    setSettings((prev) => ({
       ...prev,
-      showMiniMap: !prev.showMiniMap
+      showMiniMap: !prev.showMiniMap,
     }));
   };
 
   const handleNodeMessageChange = (e) => {
     if (selectedNode) {
-      setSelectedNode(prev => ({
+      setSelectedNode((prev) => ({
         ...prev,
         data: {
           ...prev.data,
-          message: e.target.value
-        }
+          message: e.target.value,
+        },
       }));
     }
   };
 
-  // Get connected edges for selected node
+  const handleSaveNode = () => {
+    if (selectedNode) {
+      setNodes(prevNodes => prevNodes.map(node => {
+        if (node.id === selectedNode.id) {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              message: selectedNode.data.message
+            }
+          };
+        }
+        return node;
+      }));
+    }
+  };
+
   const getNodeConnections = () => {
     if (!selectedNode || !getEdges()) return { connectedNodes: [] };
-    
-    // Get all edges connected to this node (both as source or target)
-    const connectedEdges = getEdges().filter(edge => 
-      edge.source === selectedNode.id || edge.target === selectedNode.id
+
+    const connectedEdges = getEdges().filter(
+      (edge) =>
+        edge.source === selectedNode.id || edge.target === selectedNode.id
     );
-    
+
     // Get unique connected nodes
     const connectedNodeIds = new Set(
-      connectedEdges.flatMap(edge => [edge.source, edge.target])
+      connectedEdges.flatMap((edge) => [edge.source, edge.target])
     );
     // Remove the selected node's ID
     connectedNodeIds.delete(selectedNode.id);
-    
+
     // Get the actual node objects
     const connectedNodes = Array.from(connectedNodeIds)
-      .map(id => getNodes().find(n => n.id === id))
+      .map((id) => getNodes().find((n) => n.id === id))
       .filter(Boolean);
-    
+
     return { connectedNodes };
   };
 
   const getNodeLabel = (node) => {
-    return node ? `${node.type} (${node.id})` : 'Unknown Node';
+    return node ? `${node.type} (${node.id})` : "Unknown Node";
   };
 
   return (
@@ -69,7 +87,6 @@ const SettingsPane = () => {
           <span className="font-semibold">Global Settings</span>
         </div>
         <div className="p-3 bg-[#F9F3EF]">
-        
           <div className="flex items-center gap-2">
             <input
               type="checkbox"
@@ -78,7 +95,9 @@ const SettingsPane = () => {
               onChange={handleShowMiniMapToggle}
               className="w-4 h-4"
             />
-            <label htmlFor="showMiniMap" className="text-sm">Show Mini Map</label>
+            <label htmlFor="showMiniMap" className="text-sm">
+              Show Mini Map
+            </label>
           </div>
         </div>
       </div>
@@ -100,7 +119,7 @@ const SettingsPane = () => {
                 {selectedNode.id}
               </div>
             </div>
-            
+
             {/* Node Type */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -122,7 +141,12 @@ const SettingsPane = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md min-h-[100px] text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3C53] focus:border-transparent"
                 placeholder="Enter node message..."
               />
-              <button className="bg-[#456882] text-gray-100 text-m border-2 border-[#1B3C53] rounded-md px-2 py-1" onClick={handleNodeMessageChange}>Save</button>
+              <button
+                className="bg-[#456882] text-gray-100 text-m border-2 border-[#1B3C53] rounded-md px-2 py-1"
+                onClick={handleSaveNode}
+              >
+                Save
+              </button>
             </div>
 
             {/* Connected Nodes Information */}
@@ -133,12 +157,15 @@ const SettingsPane = () => {
                   Connected Nodes
                 </label>
               </div>
-              
+
               <div>
                 <div className="space-y-1">
                   {getNodeConnections().connectedNodes.length > 0 ? (
-                    getNodeConnections().connectedNodes.map(node => (
-                      <div key={node.id} className="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm text-gray-600">
+                    getNodeConnections().connectedNodes.map((node) => (
+                      <div
+                        key={node.id}
+                        className="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm text-gray-600"
+                      >
                         {getNodeLabel(node)}
                       </div>
                     ))
@@ -152,7 +179,6 @@ const SettingsPane = () => {
             </div>
 
             {/* Position Information */}
-
           </div>
         </div>
       ) : (

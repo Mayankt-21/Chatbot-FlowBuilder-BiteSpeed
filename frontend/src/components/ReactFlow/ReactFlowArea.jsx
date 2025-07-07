@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import {
   ReactFlow,
   Background,
@@ -60,8 +60,6 @@ const BackgroundType = {
 };
 
 const ReactFlowArea = () => {
-  const [nodes, setNodes] = useState(initialNodes);
-  const [edges, setEdges] = useState(initialEdges);
   const reactFlowInstance = useReactFlow();
   
   const { 
@@ -69,8 +67,20 @@ const ReactFlowArea = () => {
     setSettings,
     selectedNode,
     setSelectedNode,
-    setActivePane 
+    nodes,
+    setNodes,
+    addNode,
+    deleteNode,
+    updateNodes
   } = useAppContext();
+
+  const [edges, setEdges] = React.useState(initialEdges);
+  const [reactFlowNodes, setReactFlowNodes] = React.useState(nodes);
+
+  // Sync React Flow nodes with context nodes
+  useEffect(() => {
+    setReactFlowNodes(nodes);
+  }, [nodes]);
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
@@ -108,9 +118,9 @@ const ReactFlowArea = () => {
         isDraggable: true,
       };
 
-      setNodes((nds) => nds.concat(newNode));
+      addNode(newNode);
     },
-    [nodes, reactFlowInstance]
+    [nodes, reactFlowInstance, addNode]
   );
 
   const onConnect = useCallback(
@@ -133,8 +143,8 @@ const ReactFlowArea = () => {
 
   const onNodeClick = useCallback((event, node) => {
     setSelectedNode(node);
-    setActivePane('settings');
-  }, [setSelectedNode, setActivePane]);
+    setSettings(prev => ({ ...prev, activePane: 'settings' }));
+  }, [setSelectedNode, setSettings]);
 
   // Handle node movement
   const onNodeDrag = useCallback((event, node, nodes) => {
@@ -149,30 +159,18 @@ const ReactFlowArea = () => {
     window.dispatchEvent(moveEvent);
   }, []);
 
-  const onNodeDragStop = useCallback((event, node, nodes) => {
+  const onNodeDragStop = useCallback((event, node) => {
     // Update node positions after drag
-    setNodes((nds) =>
-      nds.map((n) => {
-        if (n.id === node.id) {
-          return {
-            ...n,
-            position: node.position,
-          };
-        }
-        return n;
-      })
-    );
-
-    // Dispatch node movement end event
-    const dragEndEvent = new CustomEvent('nodeDragComplete', {
-      detail: {
-        nodeId: node.id,
-        finalPosition: node.position,
-        nodes: nodes
+    updateNodes(nodes.map((n) => {
+      if (n.id === node.id) {
+        return {
+          ...n,
+          position: node.position,
+        };
       }
-    });
-    window.dispatchEvent(dragEndEvent);
-  }, []);
+      return n;
+    }));
+  }, [nodes, updateNodes]);
 
   const onNodesDelete = useCallback(
     (nodesToDelete) => {
@@ -186,12 +184,10 @@ const ReactFlowArea = () => {
         )
       );
       
-      // Clear selected node if it was deleted
-      if (nodesToDelete.some(node => node.id === selectedNode?.id)) {
-        setSelectedNode(null);
-      }
+      // Delete nodes from context
+      nodesToDelete.forEach(node => deleteNode(node.id));
     },
-    [selectedNode, setSelectedNode]
+    [deleteNode]
   );
 
   // Get current flow state
@@ -228,7 +224,7 @@ const ReactFlowArea = () => {
   };
 
   // Add event listeners for node movement tracking
-  React.useEffect(() => {
+  useEffect(() => {
     const logNodeMovement = (event) => {
       console.log('Node Movement:', event.detail);
     };
@@ -245,7 +241,7 @@ const ReactFlowArea = () => {
   return (
     <div className="w-full h-full text-black">
       <ReactFlow
-        nodes={nodes}
+        nodes={reactFlowNodes}
         edges={edges}
         nodeTypes={nodeTypes}
         onDragOver={onDragOver}
