@@ -17,6 +17,8 @@ const NodesPane = () => {
           <MessageSquare size={16}/>
           <span className=" text-m font-semibold"> Message </span>
         </div>
+        
+        <span className="text-sm font-semibold text-gray-500 flex justify-center items-center mt-50 rounded-md border-dashed border-2 border-gray-200 mx-5 p-3"> More Nodes To be Added Soon ... </span>
       </div>
   );
 };

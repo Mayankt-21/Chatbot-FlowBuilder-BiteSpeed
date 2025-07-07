@@ -96,7 +96,8 @@ const SettingsPane = () => {
               id="showMiniMap"
               checked={settings.showMiniMap}
               onChange={handleShowMiniMapToggle}
-              className="w-4 h-4"
+              className="w-4 h-4 cursor-pointer"
+
             />
             <label htmlFor="showMiniMap" className="text-sm">
               Show Mini Map

@@ -167,14 +167,6 @@ const ReactFlowArea = () => {
     [deleteNode]
   );
 
-  // Get current flow state
-  const getFlowState = useCallback(() => {
-    if (reactFlowInstance) {
-      const flowState = reactFlowInstance.toObject();
-      console.log('Current Flow State:', flowState);
-      return flowState;
-    }
-  }, [reactFlowInstance]);
 
   const BackgroundButtons = () => {
     return (
@@ -190,12 +182,6 @@ const ReactFlowArea = () => {
             {value}
           </button>
         ))}
-        <button
-          onClick={getFlowState}
-          className="flex justify-center items-center bg-green-600 text-white rounded-md p-2 ml-4"
-        >
-          View Flow State
-        </button>
       </div>
     );
   };
@@ -214,6 +200,11 @@ const ReactFlowArea = () => {
       window.removeEventListener('nodeDragComplete', logNodeMovement);
     };
   }, []);
+
+  // Deselect node when clicking on empty space
+  const handlePaneClick = useCallback(() => {
+    setSelectedNode(null);
+  }, [setSelectedNode]);
 
   return (
     <div className="w-full h-full text-black">
@@ -238,12 +229,18 @@ const ReactFlowArea = () => {
         selectNodesOnDrag={true}
         panOnDrag={[0, 1]}
         className="transition-all duration-300 ease-in-out"
+        onPaneClick={handlePaneClick}
       >
         <Panel position="top-left">
           <BackgroundButtons/>
         </Panel>
         <Background variant={settings.backgroundType} />
-        {settings.showMiniMap && <MiniMap />}
+        {settings.showMiniMap && <MiniMap nodeStrokeWidth={3} nodeColor={() => {
+          if (selectedNode?.id === node.id) {
+            return '#1B3C53';
+          }
+          return '#456882';
+        }} />}
         <Controls/>
       </ReactFlow>
     </div>

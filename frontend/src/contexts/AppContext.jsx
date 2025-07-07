@@ -28,7 +28,7 @@ export const AppContextProvider = ({ children }) => {
 
   // Settings state
   const [settings, setSettings] = useState({
-    showMiniMap: true,
+    showMiniMap: false,
     backgroundType: 'dots',
     // Add more settings as needed
   });

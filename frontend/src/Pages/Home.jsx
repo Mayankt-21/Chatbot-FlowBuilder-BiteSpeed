@@ -47,9 +47,9 @@ const Home = () => {
             </button>
 
             {/* Sidebar Content */}
-            <div className="flex-1 h-full flex flex-col">
+            <div className="flex-1 h-full flex flex-col mt-2">
               {/* Sticky Pane Buttons */}
-              <div className="flex gap-2 p-3 bg-gray-100 border-b sticky top-0 z-10">
+              <div className="flex gap-2 p-3 bg-stone-200 rounded-md border-b sticky top-0 z-10">
                 <button
                   onClick={() => setActivePane("nodes")}
                   className={`px-3 py-1.5 rounded ${
