@@ -13,31 +13,6 @@ import MessageNode from "../NodeTypes/MessageNode";
 import { useAppContext } from "../../contexts/AppContext";
 import "@xyflow/react/dist/style.css";
 
-const initialNodes = [
-  {
-    id: "initialNode1",
-    type: "messageNode",
-    position: { x: 0, y: 0 },
-    data: {
-      label: "Message Node 1",
-      message: "This is the first message",
-    },
-    isConnectable: true,
-    isDraggable: true,
-  },
-  {
-    id: "initialNode2",
-    type: "messageNode",
-    position: { x: 0, y: 150 },
-    data: {
-      label: "Message Node 2",
-      message: "This is the second message",
-    },
-  },
-];
-
-const initialEdges = [];
-
 // Define the node types
 const nodeTypes = {
   messageNode: MessageNode,
@@ -71,10 +46,11 @@ const ReactFlowArea = () => {
     setNodes,
     addNode,
     deleteNode,
-    updateNodes
+    updateNodes,
+    edges,
+    setEdges,
   } = useAppContext();
 
-  const [edges, setEdges] = React.useState(initialEdges);
   const [reactFlowNodes, setReactFlowNodes] = React.useState(nodes);
 
   // Sync React Flow nodes with context nodes
@@ -140,6 +116,7 @@ const ReactFlowArea = () => {
     },
     [edges]
   );
+
 
   const onNodeClick = useCallback((event, node) => {
     setSelectedNode(node);

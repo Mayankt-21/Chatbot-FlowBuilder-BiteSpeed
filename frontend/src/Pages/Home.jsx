@@ -47,8 +47,9 @@ const Home = () => {
             </button>
 
             {/* Sidebar Content */}
-            <div className="flex-1 overflow-auto">
-              <div className="flex gap-2 p-3 bg-gray-100 border-b">
+            <div className="flex-1 h-full flex flex-col">
+              {/* Sticky Pane Buttons */}
+              <div className="flex gap-2 p-3 bg-gray-100 border-b sticky top-0 z-10">
                 <button
                   onClick={() => setActivePane("nodes")}
                   className={`px-3 py-1.5 rounded ${
@@ -71,8 +72,9 @@ const Home = () => {
                 </button>
               </div>
               
-              <div className="p-4">
-                {activePane === "settings" ? <SettingsPane /> : <NodesPane />}
+              {/* Scrollable Content Area */}
+              <div className="flex-1 overflow-y-auto">
+                {activePane === "settings" ? <SettingsPane/> : <NodesPane />}
               </div>
             </div>
           </div>

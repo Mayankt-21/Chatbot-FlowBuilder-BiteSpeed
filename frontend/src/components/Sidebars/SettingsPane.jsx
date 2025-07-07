@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useAppContext } from "../../contexts/AppContext";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Trash2, Save } from "lucide-react";
 import { useReactFlow } from "@xyflow/react";
 import { ArrowLeftRight } from "lucide-react";
 
@@ -11,10 +11,13 @@ const SettingsPane = () => {
     selectedNode,
     setSelectedNode,
     nodes,
-    setNodes
+    setNodes,
+    edges,
+    removeEdge,
+    deleteNode,
   } = useAppContext();
 
-  const { getEdges, getNodes } = useReactFlow();
+  const { getNodes } = useReactFlow();
 
   const handleShowMiniMapToggle = () => {
     setSettings((prev) => ({
@@ -37,42 +40,42 @@ const SettingsPane = () => {
 
   const handleSaveNode = () => {
     if (selectedNode) {
-      setNodes(prevNodes => prevNodes.map(node => {
-        if (node.id === selectedNode.id) {
-          return {
-            ...node,
-            data: {
-              ...node.data,
-              message: selectedNode.data.message
-            }
-          };
-        }
-        return node;
-      }));
+      setNodes((prevNodes) =>
+        prevNodes.map((node) => {
+          if (node.id === selectedNode.id) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                message: selectedNode.data.message,
+              },
+            };
+          }
+          return node;
+        })
+      );
     }
   };
 
-  const getNodeConnections = () => {
-    if (!selectedNode || !getEdges()) return { connectedNodes: [] };
+  // Delete the node and update context/UI
+  const handleDeleteNode = () => {
+    if (selectedNode) {
+      deleteNode(selectedNode.id);
+    }
+  };
 
-    const connectedEdges = getEdges().filter(
+  // Get all edges connected to the selected node
+  const getConnectedEdges = () => {
+    if (!selectedNode || !edges) return [];
+    return edges.filter(
       (edge) =>
         edge.source === selectedNode.id || edge.target === selectedNode.id
     );
+  };
 
-    // Get unique connected nodes
-    const connectedNodeIds = new Set(
-      connectedEdges.flatMap((edge) => [edge.source, edge.target])
-    );
-    // Remove the selected node's ID
-    connectedNodeIds.delete(selectedNode.id);
-
-    // Get the actual node objects
-    const connectedNodes = Array.from(connectedNodeIds)
-      .map((id) => getNodes().find((n) => n.id === id))
-      .filter(Boolean);
-
-    return { connectedNodes };
+  // Delete a specific edge by id using context
+  const handleDeleteEdgeById = (edgeId) => {
+    removeEdge(edgeId);
   };
 
   const getNodeLabel = (node) => {
@@ -105,9 +108,16 @@ const SettingsPane = () => {
       {/* Node Settings */}
       {selectedNode ? (
         <div className="border-2 border-[#1B3C53] rounded-md overflow-hidden">
-          <div className="flex bg-[#456882] text-gray-100 text-m border-b-2 border-[#1B3C53] justify-start items-center px-2 py-1 gap-1">
-            <MessageSquare size={16} className="text-gray-100" />
-            <span className="font-semibold">Node Settings</span>
+          <div className="flex bg-[#456882] text-gray-100 text-m border-b-2 border-[#1B3C53] justify-between items-center px-2 py-1">
+            <div className="flex items-center gap-1">
+              <MessageSquare size={16} className="text-gray-100" />
+              <span className="font-semibold">
+                {selectedNode.type
+                  .slice(0, 1)
+                  .toUpperCase() + selectedNode.type.slice(1,-4) + " " + selectedNode.type.slice(-4)} 
+                Settings
+              </span>
+            </div>
           </div>
           <div className="flex flex-col gap-3 p-3 bg-[#F9F3EF]">
             {/* Node ID */}
@@ -117,16 +127,6 @@ const SettingsPane = () => {
               </label>
               <div className="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm text-gray-600">
                 {selectedNode.id}
-              </div>
-            </div>
-
-            {/* Node Type */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Node Type
-              </label>
-              <div className="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm text-gray-600">
-                {selectedNode.type}
               </div>
             </div>
 
@@ -141,12 +141,21 @@ const SettingsPane = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md min-h-[100px] text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3C53] focus:border-transparent"
                 placeholder="Enter node message..."
               />
-              <button
-                className="bg-[#456882] text-gray-100 text-m border-2 border-[#1B3C53] rounded-md px-2 py-1"
-                onClick={handleSaveNode}
-              >
-                Save
-              </button>
+              <div className="flex flex-row items-center justify-start gap-3 mt-3">
+                <button
+                  className="flex flex-row items-center gap-1 bg-[#456882] text-gray-100 border-2 border-[#1B3C53] rounded-md px-3 py-1.5 hover:bg-[#1B3C53] transition-colors"
+                  onClick={handleSaveNode}
+                >
+                  <Save size={16} className="mr-1" /> Save
+                </button>
+                <button
+                  className="flex flex-row items-center gap-1 bg-[#FF6347] text-gray-100 border-2 border-[#1B3C53] rounded-md px-3 py-1.5 hover:bg-[#d13c1a] transition-colors"
+                  onClick={handleDeleteNode}
+                  title="Delete Node"
+                >
+                  <Trash2 size={16} className="mr-1" /> Delete
+                </button>
+              </div>
             </div>
 
             {/* Connected Nodes Information */}
@@ -160,15 +169,31 @@ const SettingsPane = () => {
 
               <div>
                 <div className="space-y-1">
-                  {getNodeConnections().connectedNodes.length > 0 ? (
-                    getNodeConnections().connectedNodes.map((node) => (
-                      <div
-                        key={node.id}
-                        className="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm text-gray-600"
-                      >
-                        {getNodeLabel(node)}
-                      </div>
-                    ))
+                  {getConnectedEdges().length > 0 ? (
+                    getConnectedEdges().map((edge) => {
+                      // Find the other node in the edge
+                      const otherNodeId =
+                        edge.source === selectedNode.id
+                          ? edge.target
+                          : edge.source;
+                      const otherNode = getNodes().find(
+                        (n) => n.id === otherNodeId
+                      );
+                      return (
+                        <div key={edge.id} className="flex items-center gap-2">
+                          <div className="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm text-gray-600">
+                            {getNodeLabel(otherNode)}
+                          </div>
+                          <button
+                            className="text-red-500"
+                            onClick={() => handleDeleteEdgeById(edge.id)}
+                            title="Delete Edge"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      );
+                    })
                   ) : (
                     <div className="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm text-gray-500 italic">
                       No connected nodes

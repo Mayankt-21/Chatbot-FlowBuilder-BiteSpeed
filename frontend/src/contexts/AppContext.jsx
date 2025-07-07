@@ -18,6 +18,7 @@ export const AppContextProvider = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [sidebarWidth] = useState(300); // Fixed width in pixels
   const [nodes, setNodes] = useState([]);
+  const [edges, setEdges] = useState([]);
 
   // Active pane state
   const [activePane, setActivePane] = useState('nodes');
@@ -68,7 +69,14 @@ export const AppContextProvider = ({ children }) => {
   };
 
   const deleteNode = (nodeId) => {
+    // Remove the node
     setNodes(prevNodes => prevNodes.filter(node => node.id !== nodeId));
+    
+    // Remove all edges connected to this node
+    setEdges(prevEdges => prevEdges.filter(edge => 
+      edge.source !== nodeId && edge.target !== nodeId
+    ));
+
     // Clear selected node if it was deleted
     if (selectedNode?.id === nodeId) {
       setSelectedNode(null);
@@ -77,6 +85,19 @@ export const AppContextProvider = ({ children }) => {
 
   const updateNodes = (updatedNodes) => {
     setNodes(updatedNodes);
+  };
+
+  // Edge operations
+  const addEdge = (newEdge) => {
+    setEdges(prevEdges => [...prevEdges, newEdge]);
+  };
+
+  const removeEdge = (edgeId) => {
+    setEdges(prevEdges => prevEdges.filter(edge => edge.id !== edgeId));
+  };
+
+  const updateEdges = (updatedEdges) => {
+    setEdges(updatedEdges);
   };
 
   const value = {
@@ -104,6 +125,13 @@ export const AppContextProvider = ({ children }) => {
     addNode,
     deleteNode,
     updateNodes,
+
+    // Edges and Edge Operations
+    edges,
+    setEdges,
+    addEdge,
+    removeEdge,
+    updateEdges,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

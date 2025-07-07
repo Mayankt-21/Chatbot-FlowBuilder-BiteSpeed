@@ -49,7 +49,7 @@ const MessageNode = ({ id, data }) => {
           <MessageSquare size={16} className="text-gray-100" />
           <span> Message</span>
         </div>
-        <div className="flex flex-wrap px-2 py-3 text-sm rounded-b-md">
+        <div className="flex flex-wrap px-2 py-3 text-sm w-full h-full rounded-b-md">
           {message}
         </div>
       </div>
