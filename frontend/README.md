@@ -1,12 +1,113 @@
-# React + Vite
+# Chatbot Flow Builder - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern React-based frontend application for building and managing chatbot conversation flows using a visual drag-and-drop interface.
 
-Currently, two official plugins are available:
+## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Visual Flow Builder**: Drag-and-drop interface for creating chatbot conversation flows
+- **Node-based System**: Modular node system for different types of conversation elements
+- **Real-time Preview**: See your chatbot flow as you build it
+- **Responsive Design**: Modern UI with Tailwind CSS styling
+- **Collapsible Sidebar**: Toggle between nodes and settings panels
+- **Context Management**: Centralized state management with React Context
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **React 18** - Modern React with hooks and functional components
+- **Vite** - Fast build tool and development server
+- **@xyflow/react** - Powerful flow chart and diagram library
+- **React Router DOM** - Client-side routing
+- **Tailwind CSS** - Utility-first CSS framework
+- **Lucide React** - Beautiful icon library
+- **React Hot Toast** - Toast notifications
+- **React Resizable Panels** - Resizable panel components
+
+## 📁 Project Structure
+
+```
+src/
+├── components/
+│   ├── NodeTypes/
+│   │   └── MessageNode.jsx          # Message node component
+│   ├── Others/
+│   │   └── Navbar.jsx               # Navigation bar
+│   ├── ReactFlow/
+│   │   └── ReactFlowArea.jsx        # Main flow builder area
+│   └── Sidebars/
+│       ├── NodesPane.jsx            # Available nodes panel
+│       └── SettingsPane.jsx         # Node settings panel
+├── contexts/
+│   └── AppContext.jsx               # Global application state
+├── Pages/
+│   └── Home.jsx                     # Main application page
+├── App.jsx                          # Root application component
+└── main.jsx                         # Application entry point
+```
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js (version 16 or higher)
+- npm or yarn package manager
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd Chatbot-FlowBuilder-BiteSpeed/frontend
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+
+4. **Open your browser**
+   Navigate to `http://localhost:5173` to view the application
+
+
+## 🎯 Usage
+
+### Building a Chatbot Flow
+
+1. **Add Nodes**: Use the Nodes panel to drag different conversation elements onto the canvas
+2. **Connect Nodes**: Click and drag from node handles to create connections between elements
+3. **Configure Settings**: Select any node and use the Settings panel to customize its , Edit Messsage/ Remove Edges
+4. **Preview Flow**: Your changes are reflected in real-time on the canvas
+
+### Interface Overview
+
+- **Main Canvas**: The central area where you build your chatbot flow
+- **Nodes Panel**: Contains available node types that can be added to your flow
+- **Settings Panel**: Configure properties and behavior of selected nodes
+- **Collapsible Sidebar**: Toggle between nodes and settings with the arrow button
+
+## 🎨 Customization
+
+### Styling
+The application uses Tailwind CSS for styling. You can customize the appearance by modifying the CSS classes in the components.
+
+### Adding New Node Types
+To add new node types:
+1. Create a new component in `src/components/NodeTypes/`
+2. Register the node type in the flow configuration
+3. Add it to the NodesPane component
+
+## 🔧 Development
+
+### State Management
+The application uses React Context for global state management. The main context is defined in `src/contexts/AppContext.jsx`.
+
+## 📦 Build and Deployment
+
+
+### Deployment Options
+- **Vercel**: Connect your repository for automatic deployments
+
