@@ -3,6 +3,7 @@ import { useAppContext } from "../../contexts/AppContext";
 import { MessageSquare, Trash2, Save } from "lucide-react";
 import { useReactFlow } from "@xyflow/react";
 import { ArrowLeftRight } from "lucide-react";
+import toast from "react-hot-toast";
 
 const SettingsPane = () => {
   const {
@@ -54,6 +55,7 @@ const SettingsPane = () => {
           return node;
         })
       );
+      toast.success("Node Message Updated Successfully");
     }
   };
 
@@ -61,6 +63,7 @@ const SettingsPane = () => {
   const handleDeleteNode = () => {
     if (selectedNode) {
       deleteNode(selectedNode.id);
+      toast.success("Node Deleted Successfully");
     }
   };
 
@@ -76,6 +79,7 @@ const SettingsPane = () => {
   // Delete a specific edge by id using context
   const handleDeleteEdgeById = (edgeId) => {
     removeEdge(edgeId);
+    toast.success("Edge Deleted Successfully");
   };
 
   const getNodeLabel = (node) => {

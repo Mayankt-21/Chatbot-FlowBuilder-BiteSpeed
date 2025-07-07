@@ -35,6 +35,7 @@ const MessageNode = ({ id, data }) => {
         position={Position.Top}
         style={{ width: "10px", height: "10px", background: "#FF6347" }}
       />
+      
       <div 
         className={`flex flex-col rounded-md w-[200px] h-full ${
           selectedNode?.id === id ? 'bg-[#E6DFD8]' : 'bg-[#F9F3EF]'
@@ -47,7 +48,7 @@ const MessageNode = ({ id, data }) => {
       >
         <div className="flex bg-[#456882] rounded-x-md text-gray-100 text-m border-b-2 border-[#1B3C53] justify-start items-center px-2 py-1 gap-1">
           <MessageSquare size={16} className="text-gray-100" />
-          <span> Message</span>
+          <span> {id}</span>
         </div>
         <div className="flex flex-wrap px-2 py-3 text-sm w-full h-full rounded-b-md">
           {message}
