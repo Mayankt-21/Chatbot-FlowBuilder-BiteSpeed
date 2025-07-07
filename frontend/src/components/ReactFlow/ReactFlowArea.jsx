@@ -10,11 +10,12 @@ import {
   MarkerType,
 } from "@xyflow/react";
 import MessageNode from "../NodeTypes/MessageNode";
+import { useAppContext } from "../../contexts/AppContext";
 import "@xyflow/react/dist/style.css";
 
 const initialNodes = [
   {
-    id: "1",
+    id: "initialNode1",
     type: "messageNode",
     position: { x: 0, y: 0 },
     data: {
@@ -25,7 +26,7 @@ const initialNodes = [
     isDraggable: true,
   },
   {
-    id: "2",
+    id: "initialNode2",
     type: "messageNode",
     position: { x: 0, y: 150 },
     data: {
@@ -61,9 +62,15 @@ const BackgroundType = {
 const ReactFlowArea = () => {
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
-  const [variant, setvariant] = useState("dots");
-  const [showMiniMap, setShowMiniMap] = useState(true);
   const reactFlowInstance = useReactFlow();
+  
+  const { 
+    settings, 
+    setSettings,
+    selectedNode,
+    setSelectedNode,
+    setActivePane 
+  } = useAppContext();
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
@@ -124,6 +131,11 @@ const ReactFlowArea = () => {
     [edges]
   );
 
+  const onNodeClick = useCallback((event, node) => {
+    setSelectedNode(node);
+    setActivePane('settings');
+  }, [setSelectedNode, setActivePane]);
+
   // Handle node movement
   const onNodeDrag = useCallback((event, node, nodes) => {
     // Dispatch node movement event for real-time tracking
@@ -173,8 +185,13 @@ const ReactFlowArea = () => {
             )
         )
       );
+      
+      // Clear selected node if it was deleted
+      if (nodesToDelete.some(node => node.id === selectedNode?.id)) {
+        setSelectedNode(null);
+      }
     },
-    []
+    [selectedNode, setSelectedNode]
   );
 
   // Get current flow state
@@ -192,8 +209,10 @@ const ReactFlowArea = () => {
         {Object.entries(BackgroundType).map(([type, value]) => (
           <button
             key={type}
-            onClick={() => setvariant(type)}
-            className="flex justify-center items-center bg-[#1B3C53] text-white rounded-md p-2"
+            onClick={() => setSettings(prev => ({ ...prev, backgroundType: type }))}
+            className={`flex justify-center items-center ${
+              settings.backgroundType === type ? 'bg-[#324B5A]' : 'bg-[#1B3C53]'
+            } text-white rounded-md p-2`}
           >
             {value}
           </button>
@@ -224,7 +243,7 @@ const ReactFlowArea = () => {
   }, []);
 
   return (
-    <div className="w-screen h-screen text-black">
+    <div className="w-full h-full text-black">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -235,23 +254,24 @@ const ReactFlowArea = () => {
         onNodeDrag={onNodeDrag}
         onNodeDragStop={onNodeDragStop}
         onNodesDelete={onNodesDelete}
+        onNodeClick={onNodeClick}
         defaultEdgeOptions={defaultEdgeOptions}
         fitView
         snapToGrid
         snapGrid={[15, 15]}
         deleteKeyCode={['Backspace', 'Delete']}
         multiSelectionKeyCode={['Control', 'Meta']}
-        selectionOnDrag
-        selectNodesOnDrag
-        panOnDrag={[0, 1, 2]}
+        selectionOnDrag={true}
+        selectNodesOnDrag={true}
+        panOnDrag={[0, 1]}
         className="transition-all duration-300 ease-in-out"
       >
         <Panel position="top-left">
           <BackgroundButtons/>
         </Panel>
-        <Background variant={variant} />
-        {showMiniMap && <MiniMap />}
-        <Controls />
+        <Background variant={settings.backgroundType} />
+        {settings.showMiniMap && <MiniMap />}
+        <Controls/>
       </ReactFlow>
     </div>
   );

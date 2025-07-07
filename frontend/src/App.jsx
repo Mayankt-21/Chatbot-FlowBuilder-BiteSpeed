@@ -1,16 +1,16 @@
-import { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home.jsx";
+import { AppContextProvider } from "./contexts/AppContext";
+import Home from "./Pages/Home"
 
 function App() {
   return (
-    <>
+    <AppContextProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
         </Routes>
       </BrowserRouter>
-    </>
+    </AppContextProvider>
   );
 }
 
