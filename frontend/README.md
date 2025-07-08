@@ -2,6 +2,8 @@
 
 A modern React-based frontend application for building and managing chatbot conversation flows using a visual drag-and-drop interface.
 
+**Live Demo**: [https://chatbot-flow-builder-bite-speed.vercel.app/](https://chatbot-flow-builder-bite-speed.vercel.app/)
+
 ## 🚀 Features
 
 - **Visual Flow Builder**: Drag-and-drop interface for creating chatbot conversation flows
@@ -21,6 +23,7 @@ A modern React-based frontend application for building and managing chatbot conv
 - **Lucide React** - Beautiful icon library
 - **React Hot Toast** - Toast notifications
 - **React Resizable Panels** - Resizable panel components
+
 
 ## 📁 Project Structure
 
@@ -79,7 +82,7 @@ src/
 
 1. **Add Nodes**: Use the Nodes panel to drag different conversation elements onto the canvas
 2. **Connect Nodes**: Click and drag from node handles to create connections between elements
-3. **Configure Settings**: Select any node and use the Settings panel to customize its , Edit Messsage/ Remove Edges
+3. **Configure Settings**: Select any node and use the Settings panel to customize its behavior, edit messages, or remove edges
 4. **Preview Flow**: Your changes are reflected in real-time on the canvas
 
 ### Interface Overview
@@ -108,6 +111,19 @@ The application uses React Context for global state management. The main context
 ## 📦 Build and Deployment
 
 
-### Deployment Options
-- **Vercel**: Connect your repository for automatic deployments
+### Available Scripts
 
+- `npm run dev` - Start development server with hot reload
+- `npm run build` - Build the application for production
+- `npm run preview` - Preview the production build locally
+- `npm run lint` - Run ESLint to check code quality
+
+### Deployment
+- **Vercel**: Connecting Github repository for automatic deployments
+
+
+---
+
+**Built with ❤️ using React and modern web technologies**
+
+**This README was generated with the help of AI**
